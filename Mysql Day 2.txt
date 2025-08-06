@@ -1,0 +1,260 @@
+databaseSales Table
+Step 1: Create the Example Table
+CREATE TABLE Sales (
+    SaleID INT PRIMARY KEY,
+    Salesperson VARCHAR(50),
+    Region VARCHAR(50),
+    Product VARCHAR(50),
+    Quantity INT,
+    SaleAmount DECIMAL(10,2)
+);
+ Step 2: Insert Sample Data
+INSERT INTO Sales (SaleID, Salesperson, Region, Product, Quantity, SaleAmount) VALUES
+(1, 'Alice', 'North', 'Laptop', 1, 1000.00),
+(2, 'Bob', 'South', 'Mouse', 3, 75.00),
+(3, 'Alice', 'North', 'Monitor', 2, 300.00),
+(4, 'Charlie', 'East', 'Keyboard', 1, 50.00),
+(5, 'Bob', 'South', 'Monitor', 1, 150.00),
+(6, 'Alice', 'North', 'Mouse', 2, 50.00),
+(7, 'Charlie', 'East', 'Laptop', 2, 2000.00),
+(8, 'David', 'West', 'Laptop', 1, 1100.00),
+(9, 'David', 'West', 'Mouse', 4, 100.00),
+(10, 'Eve', 'South', 'Monitor', 3, 450.00),
+(11, 'Eve', 'South', 'Keyboard', 2, 100.00),
+(12, 'Eve', 'South', 'Mouse', 1, 25.00),
+(13, 'Alice', 'North', 'Keyboard', 1, 60.00),
+(14, 'Bob', 'South', 'Laptop', 1, 1200.00),
+(15, 'Charlie', 'East', 'Mouse', 2, 50.00);
+
+
+
+
+1.Find total quantity sold by each salesperson.
+       select Salesperson,sum(Quantity) from Sales group by Salesperson;
++-------------+---------------+
+| Salesperson | sum(Quantity) |
++-------------+---------------+
+| Alice       |             6 |
+| Bob         |             5 |
+| Charlie     |             5 |
+| David       |             5 |
+| Eve         |             6 |
++-------------+---------------+
+
+2.Find salespersons who sold more than 5 items in total.
+       select Salesperson,sum(Quantity) from Sales group by Salesperson having sum(Quantity) > 5;
++-------------+---------------+
+| Salesperson | sum(Quantity) |
++-------------+---------------+
+| Alice       |             6 |
+| Eve         |             6 |
++-------------+---------------+
+ 
+3.Find number of products sold by each salesperson.
+        select Salesperson,count(Product) from Sales group by Salesperson;
++-------------+----------------+
+| Salesperson | count(Product) |
++-------------+----------------+
+| Alice       |              4 |
+| Bob         |              3 |
+| Charlie     |              3 |
+| David       |              2 |
+| Eve         |              3 |
++-------------+----------------+
+
+4.List regions where total sale amount exceeded $1000.
+       select Region from Sales where SaleAmount >1000;
++--------+
+| Region |
++--------+
+| East   |
+| West   |
+| South  |
++--------+
+
+5.Show salespersons who made more than 2 sales transactions.
+         select Salesperson,count(*) as transaction from Sales group by Salesperson having count(*) > 2;
++-------------+-------------+
+| Salesperson | transaction |
++-------------+-------------+
+| Alice       |           4 |
+| Bob         |           3 |
+| Charlie     |           3 |
+| Eve         |           3 |
++-------------+-------------+
+
+6.Find total sale amount by product, and show only products that made over $500 in sales.
+       select Product,sum(SaleAmount) from Sales group by Product having sum(SaleAmount) > 500;
++---------+-----------------+
+| Product | sum(SaleAmount) |
++---------+-----------------+
+| Laptop  |         5300.00 |
+| Monitor |          900.00 |
++---------+-----------------+
+  
+7.Show the total quantity sold of each product in each region.
+        select Region,Product,sum(Quantity) from Sales group by Region,Product;
++--------+----------+---------------+
+| Region | Product  | sum(Quantity) |
++--------+----------+---------------+
+| North  | Laptop   |             1 |
+| South  | Mouse    |             4 |
+| North  | Monitor  |             2 |
+| East   | Keyboard |             1 |
+| South  | Monitor  |             4 |
+| North  | Mouse    |             2 |
+| East   | Laptop   |             2 |
+| West   | Laptop   |             1 |
+| West   | Mouse    |             4 |
+| South  | Keyboard |             2 |
+| North  | Keyboard |             1 |
+| South  | Laptop   |             1 |
+| East   | Mouse    |             2 |
++--------+----------+---------------+
+
+8.Find salespersons who sold more than 1 type of product.
+        select Salesperson,count(distinct (Product)) from Sales group by Salesperson having count(distinct(Product)) > 1;
++-------------+---------------------------+
+| Salesperson | count(distinct (Product)) |
++-------------+---------------------------+
+| Alice       |                         4 |
+| Bob         |                         3 |
+| Charlie     |                         3 |
+| David       |                         2 |
+| Eve         |                         3 |
++-------------+---------------------------+
+
+9.Find the average quantity per product sold per region, where the average is greater than1.
+        select Region,Product,avg(Quantity) from Sales group by Region,Product having avg(Quantity) > 1;
++--------+----------+---------------+
+| Region | Product  | avg(Quantity) |
++--------+----------+---------------+
+| South  | Mouse    |        2.0000 |
+| North  | Monitor  |        2.0000 |
+| South  | Monitor  |        2.0000 |
+| North  | Mouse    |        2.0000 |
+| East   | Laptop   |        2.0000 |
+| West   | Mouse    |        4.0000 |
+| South  | Keyboard |        2.0000 |
+| East   | Mouse    |        2.0000 |
++--------+----------+---------------+
+
+10.Show salespersons whose total sale amount is between $500 and $1500.
+        select Salesperson,sum(SaleAmount) from Sales group by Salesperson having  sum(SaleAmount) > 500 and sum(SaleAmount) < 1500;
++-------------+-----------------+
+| Salesperson | sum(SaleAmount) |
++-------------+-----------------+
+| Alice       |         1410.00 |
+| Bob         |         1425.00 |
+| David       |         1200.00 |
+| Eve         |          575.00 |
++-------------+-----------------+
+   
+11.List top-performing products (more than 3 units sold in total).
+         select Product,sum(Quantity) from Sales group by Product having sum(Quantity) > 3 order by sum(quantity) desc;
++----------+---------------+
+| Product  | sum(Quantity) |
++----------+---------------+
+| Mouse    |            12 |
+| Monitor  |             6 |
+| Laptop   |             5 |
+| Keyboard |             4 |
++----------+---------------+
+
+12.List salespersons who sold laptops.
+          select distinct(salesperson) from sales where product = 'laptop';
++-------------+
+| salesperson |
++-------------+
+| Alice       |
+| Charlie     |
+| David       |
+| Bob         |
++-------------+
+
+13.Find total sale amount per salesperson per region, only where it exceeds $500.
+          select salesperson,region,sum(saleamount) from sales group by salesperson,region having sum(saleamount) > 500;
++-------------+--------+-----------------+
+| salesperson | region | sum(saleamount) |
++-------------+--------+-----------------+
+| Alice       | North  |         1410.00 |
+| Bob         | South  |         1425.00 |
+| Charlie     | East   |         2100.00 |
+| David       | West   |         1200.00 |
+| Eve         | South  |          575.00 |
++-------------+--------+-----------------+
+
+14.Find salespersons who sold at least 2 different products in a single region.
+       select salesperson,region from sales group by salesperson,region having count(distinct(product)) >= 2;
++-------------+--------+
+| salesperson | region |
++-------------+--------+
+| Alice       | North  |
+| Bob         | South  |
+| Charlie     | East   |
+| David       | West   |
+| Eve         | South  |
++-------------+--------+
+
+15.Find products that were sold in more than one region.
+      select product from sales group by product having count(distinct(region)) > 1;
++----------+
+| product  |
++----------+
+| Keyboard |
+| Laptop   |
+| Monitor  |
+| Mouse    |
++----------+
+
+16.Show total number of sales per product and hide products with fewer than 2 sales.
+       select product,count(*) from sales group by product having count(*) > 2;
++----------+----------+
+| product  | count(*) |
++----------+----------+
+| Laptop   |        4 |
+| Mouse    |        5 |
+| Monitor  |        3 |
+| Keyboard |        3 |
++----------+----------+
+
+17.Find region-wise total quantity sold by each salesperson.
+     select salesperson,region,sum(quantity) from sales group by salesperson,region order by salesperson,region;
++-------------+--------+---------------+
+| salesperson | region | sum(quantity) |
++-------------+--------+---------------+
+| Alice       | North  |             6 |
+| Bob         | South  |             5 |
+| Charlie     | East   |             5 |
+| David       | West   |             5 |
+| Eve         | South  |             6 |
++-------------+--------+---------------+
+
+18.Find salespersons who made more than 3 transactions and total sales amount is over $1000.
+      select salesperson,count(*),sum(saleamount) from sales group by salesperson having count(*) > 3 and sum(saleamount) > 1000;
++-------------+----------+-----------------+
+| salesperson | count(*) | sum(saleamount) |
++-------------+----------+-----------------+
+| Alice       |        4 |         1410.00 |
++-------------+----------+-----------------+
+
+19.Find average sale amount per region and show only regions with average above $200.
+       select region,avg(saleamount) from sales group by region having avg(saleamount) > 200;
++--------+-----------------+
+| region | avg(saleamount) |
++--------+-----------------+
+| North  |      352.500000 |
+| South  |      333.333333 |
+| East   |      700.000000 |
+| West   |      600.000000 |
++--------+-----------------+
+
+20.List regions and products where more than 3 units were sold.
+      select region,product,sum(quantity) from sales group by region,product having sum(quantity) > 3;
++--------+---------+---------------+
+| region | product | sum(quantity) |
++--------+---------+---------------+
+| South  | Mouse   |             4 |
+| South  | Monitor |             4 |
+| West   | Mouse   |             4 |
++--------+---------+---------------+
