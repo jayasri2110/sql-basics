@@ -1,0 +1,402 @@
+Employee table -any all
+
+
+CREATE TABLE Employees (
+    emp_id INT,
+    name VARCHAR(50),
+    salary INT,
+    department VARCHAR(50)
+);
+
+INSERT INTO Employees (emp_id, name, salary, department) VALUES
+(1, 'Alice', 50000, 'HR'),
+(2, 'Bob', 60000, 'IT'),
+(3, 'Charlie', 70000, 'HR'),
+(4, 'David', 55000, 'IT'),
+(5, 'Eve', 65000, 'Sales'),
+(6, 'Frank', 52000, 'Finance'),
+(7, 'Grace', 48000, 'HR'),
+(8, 'Hannah', 75000, 'IT'),
+(9, 'Ian', 50000, 'Sales'),
+(10, 'Jack', 58000, 'Finance');
+
+Section 1: Using ANY
+
+
+1.Get employees whose salary is greater than ANY employee in the HR department.
+        select * from employees where  salary > any (select salary from employees where department = 'hr');
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      1 | Alice   |  50000 | HR         |
+|      2 | Bob     |  60000 | IT         |
+|      3 | Charlie |  70000 | HR         |
+|      4 | David   |  55000 | IT         |
+|      5 | Eve     |  65000 | Sales      |
+|      6 | Frank   |  52000 | Finance    |
+|      8 | Hannah  |  75000 | IT         |
+|      9 | Ian     |  50000 | Sales      |
+|     10 | Jack    |  58000 | Finance    |
++--------+---------+--------+------------+  
+  
+2.Get employees whose salary is less than ANY employee in the IT department.
+        select * from employees where  salary < any (select salary from employees where department = 'it');
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      1 | Alice   |  50000 | HR         |
+|      2 | Bob     |  60000 | IT         |
+|      3 | Charlie |  70000 | HR         |
+|      4 | David   |  55000 | IT         |
+|      5 | Eve     |  65000 | Sales      |
+|      6 | Frank   |  52000 | Finance    |
+|      7 | Grace   |  48000 | HR         |
+|      9 | Ian     |  50000 | Sales      |
+|     10 | Jack    |  58000 | Finance    |
++--------+---------+--------+------------+  
+
+3.Find employees whose salary is equal to ANY salary in the Finance department.
+      select * from employees where  salary = any (select salary from employees where department = 'finance');
++--------+-------+--------+------------+
+| emp_id | name  | salary | department |
++--------+-------+--------+------------+
+|      6 | Frank |  52000 | Finance    |
+|     10 | Jack  |  58000 | Finance    |
++--------+-------+--------+------------+
+
+4.Find employees whose salary is greater than ANY salary in the Sales department.
+       select * from employees where  salary > any (select salary from employees where department = 'sales');
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      2 | Bob     |  60000 | IT         |
+|      3 | Charlie |  70000 | HR         |
+|      4 | David   |  55000 | IT         |
+|      5 | Eve     |  65000 | Sales      |
+|      6 | Frank   |  52000 | Finance    |
+|      8 | Hannah  |  75000 | IT         |
+|     10 | Jack    |  58000 | Finance    |
++--------+---------+--------+------------+  
+
+5.Find employees whose salary is less than ANY employee in the Finance department.
+        select * from employees where  salary < any (select salary from employees where department = 'finance');
++--------+-------+--------+------------+
+| emp_id | name  | salary | department |
++--------+-------+--------+------------+
+|      1 | Alice |  50000 | HR         |
+|      4 | David |  55000 | IT         |
+|      6 | Frank |  52000 | Finance    |
+|      7 | Grace |  48000 | HR         |
+|      9 | Ian   |  50000 | Sales      |
++--------+-------+--------+------------+  
+
+6.Find employees whose salary is not equal to ANY salary in the HR department.
+(Hint: Use != ALL instead of != ANY for correct logic.)
+        select * from employees where  salary <> any (select salary from employees where department = 'hr');
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      1 | Alice   |  50000 | HR         |
+|      2 | Bob     |  60000 | IT         |
+|      3 | Charlie |  70000 | HR         |
+|      4 | David   |  55000 | IT         |
+|      5 | Eve     |  65000 | Sales      |
+|      6 | Frank   |  52000 | Finance    |
+|      7 | Grace   |  48000 | HR         |
+|      8 | Hannah  |  75000 | IT         |
+|      9 | Ian     |  50000 | Sales      |
+|     10 | Jack    |  58000 | Finance    |
++--------+---------+--------+------------+  
+
+7.Select employees from IT who earn more than ANY HR employee.
+        select * from employees where department = 'it' and salary > any(select salary from employees where department = 'hr');
++--------+--------+--------+------------+
+| emp_id | name   | salary | department |
++--------+--------+--------+------------+
+|      2 | Bob    |  60000 | IT         |
+|      4 | David  |  55000 | IT         |
+|      8 | Hannah |  75000 | IT         |
++--------+--------+--------+------------+  
+
+8.Select employees from Sales who earn less than ANY IT employee.
+       select * from employees where department = 'sales' and salary < any(select salary from employees where department = 'it');
++--------+------+--------+------------+
+| emp_id | name | salary | department |
++--------+------+--------+------------+
+|      5 | Eve  |  65000 | Sales      |
+|      9 | Ian  |  50000 | Sales      |
++--------+------+--------+------------+  
+
+9.List employees whose salary is higher than ANY employee in a different department.
+       select * from employees where  salary > any (select salary from employees);
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      1 | Alice   |  50000 | HR         |
+|      2 | Bob     |  60000 | IT         |
+|      3 | Charlie |  70000 | HR         |
+|      4 | David   |  55000 | IT         |
+|      5 | Eve     |  65000 | Sales      |
+|      6 | Frank   |  52000 | Finance    |
+|      8 | Hannah  |  75000 | IT         |
+|      9 | Ian     |  50000 | Sales      |
+|     10 | Jack    |  58000 | Finance    |
++--------+---------+--------+------------+  
+
+10.Find employees whose salary is greater than ANY employee named 'Grace'.
+        select * from employees where  salary > any(select salary from employees where name = 'grace');
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      1 | Alice   |  50000 | HR         |
+|      2 | Bob     |  60000 | IT         |
+|      3 | Charlie |  70000 | HR         |
+|      4 | David   |  55000 | IT         |
+|      5 | Eve     |  65000 | Sales      |
+|      6 | Frank   |  52000 | Finance    |
+|      8 | Hannah  |  75000 | IT         |
+|      9 | Ian     |  50000 | Sales      |
+|     10 | Jack    |  58000 | Finance    |
++--------+---------+--------+------------+  
+
+Section 2: Using ALL
+
+
+11.Get employees whose salary is greater than ALL employees in the HR department.
+     select * from employees where salary > all(select salary from employees where department = 'hr');
++--------+--------+--------+------------+
+| emp_id | name   | salary | department |
++--------+--------+--------+------------+
+|      8 | Hannah |  75000 | IT         |
++--------+--------+--------+------------+
+
+12.Find employees whose salary is less than ALL employees in the IT department.
+     select * from employees where salary < all(select salary from employees where department = 'it');
++--------+-------+--------+------------+
+| emp_id | name  | salary | department |
++--------+-------+--------+------------+
+|      1 | Alice |  50000 | HR         |
+|      6 | Frank |  52000 | Finance    |
+|      7 | Grace |  48000 | HR         |
+|      9 | Ian   |  50000 | Sales      |
++--------+-------+--------+------------+
+
+13.Find employees whose salary is equal to ALL employees in the Sales department.
+     select * from Employees where salary = ALL (select salary from employees where department = 'Sales');
+Empty set (0.00 sec) 
+
+14.List employees who earn more than ALL employees in the Finance department.
+     select * from Employees where salary > ALL (select salary from employees where department = 'Finance');
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      2 | Bob     |  60000 | IT         |
+|      3 | Charlie |  70000 | HR         |
+|      5 | Eve     |  65000 | Sales      |
+|      8 | Hannah  |  75000 | IT         |
++--------+---------+--------+------------+
+
+15.Get employees whose salary is less than ALL employees in the Sales department.
+        select * from Employees where salary < ALL (select salary from employees where department = 'Sales');
++--------+-------+--------+------------+
+| emp_id | name  | salary | department |
++--------+-------+--------+------------+
+|      7 | Grace |  48000 | HR         |
++--------+-------+--------+------------+
+
+16.Find employees whose salary is not equal to ALL employees in the HR department.
+      select * from Employees where salary <> ALL (select salary from employees where department = 'HR');
++--------+--------+--------+------------+
+| emp_id | name   | salary | department |
++--------+--------+--------+------------+
+|      2 | Bob    |  60000 | IT         |
+|      4 | David  |  55000 | IT         |
+|      5 | Eve    |  65000 | Sales      |
+|      6 | Frank  |  52000 | Finance    |
+|      8 | Hannah |  75000 | IT         |
+|     10 | Jack   |  58000 | Finance    |
++--------+--------+--------+------------+
+
+17.Find employees from HR who earn more than ALL employees in Sales.
+       select * from Employees where department = 'HR' and salary > ALL (select salary from employees where department = 'Sales');
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      3 | Charlie |  70000 | HR         |
++--------+---------+--------+------------+
+
+18.Find employees from Finance who earn less than ALL employees in IT.
+        select * from Employees where department = 'Finance' and salary < ALL (select salary from employees where department = 'IT');
++--------+-------+--------+------------+
+| emp_id | name  | salary | department |
++--------+-------+--------+------------+
+|      6 | Frank |  52000 | Finance    |
++--------+-------+--------+------------+
+
+19.Select employees whose salary is higher than ALL employees whose salary is under 60000.
+         select * from Employees where salary > ALL (select salary from employees where salary < 60000);
++--------+---------+--------+------------+
+| emp_id | name    | salary | department |
++--------+---------+--------+------------+
+|      2 | Bob     |  60000 | IT         |
+|      3 | Charlie |  70000 | HR         |
+|      5 | Eve     |  65000 | Sales      |
+|      8 | Hannah  |  75000 | IT         |
++--------+---------+--------+------------+
+
+20.List employees whose salary is less than ALL employees earning above 60000.
+         select * from Employees where salary < ALL (select salary from employees where salary > 60000);
++--------+-------+--------+------------+
+| emp_id | name  | salary | department |
++--------+-------+--------+------------+
+|      1 | Alice |  50000 | HR         |
+|      2 | Bob   |  60000 | IT         |
+|      4 | David |  55000 | IT         |
+|      6 | Frank |  52000 | Finance    |
+|      7 | Grace |  48000 | HR         |
+|      9 | Ian   |  50000 | Sales      |
+|     10 | Jack  |  58000 | Finance    |
++--------+-------+--------+------------+    
+ 
+
+HACKERRANK:
+
+DAY 2:
+  
+1.Query all columns (attributes) for every row in the CITY table.
+   select * from CITY;
+
+2.Query all columns for a city in CITY with the ID 1661.
+    select * from CITY where ID = 1661;
+
+3.Query all attributes of every Japanese city in the CITY table. The COUNTRYCODE for Japan is JPN.
+     select * from CITY where COUNTRYCODE = 'JPN';
+
+4.Query the names of all the Japanese cities in the CITY table. The COUNTRYCODE for Japan is JPN.
+     select name from CITY where COUNTRYCODE = 'JPN';
+
+5.Query a list of CITY and STATE from the STATION table.
+     select CITY,STATE from STATION;
+
+6.Query all columns for all American cities in the CITY table with populations larger than 100000. The CountryCode for America is USA.
+    SELECT * FROM CITY WHERE CountryCode = 'USA' AND Population > 100000;
+
+7.Query the NAME field for all American cities in the CITY table with populations larger than 120000. The CountryCode for America is USA.
+    SELECT NAME FROM CITY WHERE POPULATION > 120000 AND CountryCode = 'USA';
+
+8.Query a list of CITY names from STATION for cities that have an even ID number. Print the results in any order, but exclude duplicates from the answer.
+     SELECT DISTINCT CITY FROM STATION WHERE ID % 2 = 0; 
+
+
+DAY-04
+
+1.Write a query that prints a list of employee names (i.e.: the name attribute) for employees in Employee having a salary greater than 1000  per month who have been employees for less than 10  months. 
+  Sort your result by ascending employee_id.
+
+  Ans:
+  select name from Employee where salary >2000 and months<10;
+
+2.Query the average population for all cities in CITY, rounded down to the nearest integer.
+
+  ANS:
+  select round(avg(population)) from city ;
+
+3.Query the sum of the populations for all Japanese cities in CITY. The COUNTRYCODE for Japan is JPN.
+
+  ANS:
+  SELECT SUM(POPULATION) FROM CITY WHERE COUNTRYCODE='JPN';
+
+4.Query the difference between the maximum and minimum populations in CITY.
+
+  ANS:
+  SELECT MAX(POPULATION)- MIN(POPULATION) FROM CITY;
+
+5.Query the following two values from the STATION table:
+  1.The sum of all values in LAT_N rounded to a scale of  decimal places.
+  2.The sum of all values in LONG_W rounded to a scale of  decimal places. 
+ 
+  ANS:
+  SELECT ROUND(SUM(LAT_N), 2) AS lat, ROUND(SUM(LONG_W), 2) AS lon FROM STATION;
+
+6.Query a count of the number of cities in CITY having a Population larger than 100,000
+  
+  ANS:
+  SELECT COUNT(*) FROM CITY WHERE POPULATION >100000;
+
+7.Query the total population of all cities in CITY where District is California.
+  
+  ANS:
+  SELECT SUM(Population) FROM CITY WHERE District = 'California';
+
+8.Query the average population of all cities in CITY where District is California.
+
+  ANS:
+  
+  SELECT AVG(Population) FROM CITY WHERE District = 'California';
+
+9.Write a query that prints a list of employee names (i.e.: the name attribute) from the Employee table in alphabetical order.
+
+  ANS:
+ 
+  SELECT NAME FROM EMPLOYEE ORDER BY NAME;
+
+DAY-05
+
+1.Query the list of CITY names starting with vowels (i.e., a, e, i, o, or u) from STATION. Your result cannot contain duplicates.
+
+  ANS:
+
+  SELECT DISTINCT(CITY) FROM STATION WHERE CITY LIKE 'A%'
+                                     OR CITY LIKE 'E%'
+                                     OR CITY LIKE 'I%'
+                                     OR CITY LIKE 'O%'
+                                     OR CITY LIKE 'U%';
+
+2.Query the list of CITY names ending with vowels (a, e, i, o, u) from STATION. Your result cannot contain duplicates.
+
+  ANS:
+
+  SELECT DISTINCT(CITY) FROM STATION WHERE CITY LIKE '%A'
+                                     OR CITY LIKE '%E'
+                                     OR CITY LIKE '%I'
+                                     OR CITY LIKE '%O'
+                                     OR CITY LIKE '%U';
+
+LEET CODE:
+
+586.Write a solution to find the customer_number for the customer who has placed the largest number of orders.
+
+    The test cases are generated so that exactly one customer will have placed more orders than any other customer.
+
+    ANS:
+    
+    SELECT customer_number FROM Orders GROUP BY customer_number ORDER BY COUNT(order_number) DESC LIMIT 1;
+
+182.Write a solution to report all the duplicate emails. Note that it's guaranteed that the email field is not NULL.
+
+    Return the result table in any order.
+
+    The result format is in the following example
+
+    ANS:
+   
+    SELECT email AS Email FROM Person GROUP BY email HAVING COUNT(email) > 1;
+
+596.Write a solution to find all the classes that have at least five students.
+
+    Return the result table in any order.
+
+   ANS:
+    
+    SELECT class FROM Courses GROUP BY class HAVING COUNT(student) >= 5;
+
+584.Find the names of the customer that are either:
+
+    referred by any customer with id != 2.
+    not referred by any customer.
+    Return the result table in any order.
+
+    ANS:
+    
+    SELECT name FROM Customer WHERE referee_id != 2 OR referee_id IS NULL;
+   
